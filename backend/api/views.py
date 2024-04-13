@@ -205,7 +205,7 @@ class BipDataset(Dataset):  # класс датасета
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 resnet = get_net(pth_file_path='./api/models/Resnet152_ep_6_from_10.pth', freezing=False)
 IMGSZ = (1120, 1280)
-model_path = "./api/best.pt"
+model_path = "./api/models/best.pt"
 
 custom_config = r"tessedit_char_whitelist=0123456789 --oem 0 --psm 6 --dpi 96"
 
