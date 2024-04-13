@@ -5,8 +5,7 @@ RUN mkdir /app
 WORKDIR /app
 ADD . /app
 
-RUN pip install -r requirements.txt
+RUN mkdir -p /app/api/models/
+RUN curl -o /app/api/models/Resnet152_ep_6_from_10.pth https://huggingface.co/Nikrir/Resnet152_ep_6_from_10.pth/resolve/main/Resnet152_ep_6_from_10.pth
 
-#RUN curl -O https://huggingface.co/Nikrir/Resnet152_ep_6_from_10.pth/resolve/main/Resnet152_ep_6_from_10.pth?download=true
-#RUN mkdir /app/api/models/
-#RUN mv Resnet152_ep_6_from_10.pth /app/api/model/
+RUN pip install -r requirements.txt
