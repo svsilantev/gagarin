@@ -26,26 +26,44 @@ class DownloadModel(models.Model):
         default=Status.IN_PROGRESS,
     )
 
+    def __str__(self):
+        return ' '.join([str(self.user.pk), str(self.created)])
+
 
 class ParamTypeModel(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
+    def __str__(self):
+        return ' '.join([str(self.name)])
+
 
 class DocumentsTypeModel(models.Model):
     name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return ' '.join([str(self.name)])
 
 
 class ParamTypeDocumentsTypeModel(models.Model):
     param_type = models.ForeignKey(ParamTypeModel, on_delete=models.CASCADE)
     document_type = models.ForeignKey(DocumentsTypeModel, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return ' '.join([str(self.param_type.name), str(self.document_type.name)])
+
 
 class ResultModel(models.Model):
     download = models.ForeignKey(DownloadModel, on_delete=models.CASCADE)
     document_type = models.ForeignKey(DocumentsTypeModel, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return ' '.join([str(self.download.pk), str(self.document_type.pk)])
 
 
 class ParamValueModel(models.Model):
     param_type = models.ForeignKey(ParamTypeModel, on_delete=models.CASCADE)
     value = models.CharField(max_length=255)
     result = models.ForeignKey(ResultModel, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return ' '.join([str(self.param_type.pk), str(self.value), str(self.result.pk)])

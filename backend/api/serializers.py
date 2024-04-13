@@ -15,7 +15,6 @@ class DownloadModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.DownloadModel
         fields = '__all__'
-        depth = 3
 
 
 class ParamTypeModelSerializer(serializers.ModelSerializer):
@@ -50,6 +49,7 @@ class ResultModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ResultModel
         fields = '__all__'
+        depth = 1
 
     def get_param(self, obj):
         selected_param = models.ParamValueModel.objects.filter(result=obj)

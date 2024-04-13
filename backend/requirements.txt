@@ -5,3 +5,6 @@ django-filter == 23.2
 django-cors-headers == 3.14.0
 drf-yasg==1.21.7
 pillow == 10.3.0
+torch == 2.2.0
+torchvision == 0.17.0
+numpy == 1.26.4
