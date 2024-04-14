@@ -127,7 +127,7 @@ def cropp_imgs_to_text(preds, config):  #
             texts_dict[name] = "".join(
                 c if c.isdigit() else "" for c in text
             )  # or c.isalpha()
-        except:
+        except Warning:
             continue
 
     return texts, texts_dict
@@ -229,14 +229,15 @@ class DownloadModelListView(generics.ListCreateAPIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=400)
         serializer.save(user=self.request.user)
-        print(Path('./'+str(serializer.data["photo"])))
-        dataset = BipDataset([Path('./'+str(serializer.data["photo"])), ])
+        photo_path = Path('./'+str(serializer.data["photo"]))
+        print(photo_path)
+        dataset = BipDataset([photo_path, ])
         data = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
         classes_probs, predicted_classes, filenames = predict(resnet, data)
-        preds = model.predict(['./'+str(serializer.data["photo"])], save=True, imgsz=IMGSZ)
+        preds = model.predict([photo_path], save=True, imgsz=IMGSZ)
         # вырезаем и сохраняем картинки
         texts, texts_dict = cropp_imgs_to_text(preds, custom_config)
-        data_photo = texts_dict['./'+str(serializer.data["photo"])]
+        data_photo = texts_dict[serializer.data["photo"].split('/')[-1]]
         models.DocumentsTypeModel.objects.get_or_create(name=class_names[predicted_classes[0]])
         headers = self.get_success_headers(serializer.data)
 
