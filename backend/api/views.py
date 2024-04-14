@@ -203,7 +203,7 @@ class BipDataset(Dataset):  # класс датасета
 
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-resnet = get_net(pth_file_path='./api/models/Resnet152_ep_6_from_10.pth', freezing=False)
+#resnet = get_net(pth_file_path='./api/models/Resnet152_ep_6_from_10.pth', freezing=False)
 IMGSZ = (1120, 1280)
 model_path = "./api/models/best.pt"
 
@@ -231,19 +231,36 @@ class DownloadModelListView(generics.ListCreateAPIView):
         serializer.save(user=self.request.user)
         photo_path = Path('./'+str(serializer.data["photo"]))
         print(photo_path)
-        dataset = BipDataset([photo_path, ])
-        data = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
-        classes_probs, predicted_classes, filenames = predict(resnet, data)
+        #dataset = BipDataset([photo_path, ])
+        #data = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
+        #classes_probs, predicted_classes, filenames = predict(resnet, data)
+        class_names = {
+            0: 'driver_back',
+            1: 'driver_front',
+            2: 'pas_1',
+            3: 'pas_5',
+            4: 'pas_6',
+            5: 'pas_8',
+            6: 'pts_back',
+            7: 'pts_front',
+            8: 'sts_back',
+            9: 'sts_front'
+        }
+        model = YOLO('./api/models/best_class.pt')
+        results = model([photo_path])
+
+        result = results[0]
+
         preds = model.predict([photo_path], save=True, imgsz=IMGSZ)
         # вырезаем и сохраняем картинки
         texts, texts_dict = cropp_imgs_to_text(preds, custom_config)
         data_photo = texts_dict[serializer.data["photo"].split('/')[-1]]
-        models.DocumentsTypeModel.objects.get_or_create(name=class_names[predicted_classes[0]])
+        models.DocumentsTypeModel.objects.get_or_create(name=class_names[int(result.boxes.cls)])
         headers = self.get_success_headers(serializer.data)
 
         return Response({
-            'type': class_names[predicted_classes[0]],
-            'confidence': max(classes_probs[0]),
+            'type': class_names[int(result.boxes.cls)],
+            'confidence': float(result.boxes.conf),
             'series': data_photo[:4],
             'number': data_photo[4:]
         }, status=status.HTTP_200_OK, headers=headers)
