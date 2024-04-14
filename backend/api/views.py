@@ -210,6 +210,7 @@ model_path = "./api/models/best.pt"
 custom_config = r"tessedit_char_whitelist=0123456789 --oem 0 --psm 6 --dpi 96"
 
 model = YOLO(model_path)
+model_class = YOLO('./api/models/best_class.pt')
 
 
 class DownloadModelListView(generics.ListCreateAPIView):
@@ -246,8 +247,7 @@ class DownloadModelListView(generics.ListCreateAPIView):
             8: 'sts_back',
             9: 'sts_front'
         }
-        model = YOLO('./api/models/best_class.pt')
-        results = model([photo_path])
+        results = model_class([photo_path])
 
         result = results[0]
 
@@ -259,10 +259,11 @@ class DownloadModelListView(generics.ListCreateAPIView):
         headers = self.get_success_headers(serializer.data)
 
         return Response({
-            'type': class_names[int(result.boxes.cls)],
+            'type': class_names[int(result.boxes.cls)].split('_')[0],
             'confidence': float(result.boxes.conf),
             'series': data_photo[:4],
-            'number': data_photo[4:]
+            'number': data_photo[4:],
+            'slide': class_names[int(result.boxes.cls)].split('_')[1]
         }, status=status.HTTP_200_OK, headers=headers)
 
 
